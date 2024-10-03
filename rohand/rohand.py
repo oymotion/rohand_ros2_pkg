@@ -4,7 +4,7 @@ import threading
 import time
 import rclpy
 from rclpy.node import Node
-import rclpy.node
+from rclpy.parameter import Parameter
 from sensor_msgs.msg import JointState
 
 #from pymodbus import FramerType
@@ -27,15 +27,15 @@ class ROHandNode(Node):
         self.declare_parameters(
             namespace='',
             parameters=[
-                ('port_name', rclpy.Parameter.Type.STRING),
-                ('baudrate', rclpy.Parameter.Type.INTEGER),
-                ('hand_ids', rclpy.Parameter.Type.INTEGER_ARRAY)
+                ('port_name', Parameter.Type.STRING),
+                ('baudrate', Parameter.Type.INTEGER),
+                ('hand_ids', Parameter.Type.INTEGER_ARRAY)
             ]
         )
 
-        self.port_name_ = self.get_parameter_or('port_name', "/dev/ttyUSB0")
-        self.baudrate_ = self.get_parameter_or('baudrate', 115200)
-        self.hand_ids_ = self.get_parameter_or('hand_ids', [2])
+        self.port_name_ = self.get_parameter_or('port_name', Parameter('port_name', Parameter.Type.STRING, "/dev/ttyUSB0")).value
+        self.baudrate_ = self.get_parameter_or('baudrate', Parameter('baudrate', Parameter.Type.INTEGER, 115200)).value
+        self.hand_ids_ = self.get_parameter_or('hand_ids', Parameter('hand_ids', Parameter.Type.INTEGER_ARRAY, [2])).value
         self.get_logger().info("port: %s, baudrate: %d, hand_ids: %s" % (self.port_name_, self.baudrate_, str(self.hand_ids_)))
 
         # 创建并初始化发布者成员属性pub_joint_states_
@@ -56,31 +56,26 @@ class ROHandNode(Node):
         self.thread_.start()
 
 
-    #def _init_joint_states(self):
-        #self.joint_states = JointState()
-    
-        #self.joint_states.header.stamp = self.get_clock().now().to_msg()
-        #self.joint_states.header.frame_id = ""
-        #self.joint_states.name = ['thumb', 'index', 'middle', 'ring', 'little', 'thumb_rotation']
-        #self.joint_states.position = [0, 0, 0, 0, 0, 0]
-        #self.joint_states.velocity = [0, 0, 0, 0, 0, 0]
-        #self.joint_states.effort = []
-
-
     def _joint_states_callback(self, msg):
         self.get_logger().info("I heard: %s" % msg)
 
-        hand_id = int(msg.header.frame_id.replace(FRAME_ID_PREFIX, ''))
+        try:
+            hand_id = int(msg.header.frame_id.replace(FRAME_ID_PREFIX, ''))
+        except ValueError as e:
+            hand_id = 0
+ 
+        self.get_logger().info("hand_id: %d(%s)" % (hand_id, type(hand_id)))
 
         if self.hand_ids_.index(hand_id) >= 0:
             # Set speed
             values = []
 
-            for i in range(msg.velocity):
+            for i in range(len(msg.velocity)):
                 values.append(int(msg.velocity[i]))
+
             try:
                 self.bus_mutex.acquire
-                wr = self.modbus_client_.write_register(ROH_FINGER_SPEED0, values, slave=hand_id)
+                wr = self.modbus_client_.write_registers(address=ROH_FINGER_SPEED0, values=values, slave=hand_id)
                 self.bus_mutex.release
             except ModbusException as exc:
                 self.get_logger().error(f"ERROR: exception in pymodbus {exc}")
@@ -95,12 +90,15 @@ class ROHandNode(Node):
             # 设置目标位置
             values = []
 
-            for i in range(msg.position):
-                values.append(int(msg.position[i] * 100))     # scale
+            for i in range(len(msg.position)):
+                value = int(msg.position[i] * 100)  # scale
+                if value < 0:
+                    value += 65535
+                values.append(value)
 
             try:
                 self.bus_mutex.acquire
-                wr = self.modbus_client_.write_register(ROH_FINGER_ANGLE_TARGET0, values, slave=hand_id)
+                wr = self.modbus_client_.write_registers(address=ROH_FINGER_ANGLE_TARGET0, values=values, slave=hand_id)
                 self.bus_mutex.release
             except ModbusException as exc:
                 self.get_logger().error(f"ERROR: exception in pymodbus {exc}")
@@ -143,7 +141,10 @@ class ROHandNode(Node):
                     # raise ModbusException(txt)
                 else:
                     for i in range(len(rr.registers)):
-                        joint_states.position.append(rr.registers[i] / 100)    # scale
+                        value = rr.registers[i]
+                        if value > 32767:
+                            value -= 65536 
+                        joint_states.position.append(value / 100)    # scale
 
 
                 # TODO：读取当前速度

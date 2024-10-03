@@ -4,7 +4,7 @@
   <name>rohand</name>
   <version>1.0.0</version>
   <description>ROS2 package for ROHand</description>
-  <maintainer email="support _AT_ oymotion.com">oymotion</maintainer>
+  <maintainer email="hebin7611@hotmail.com">He Bin</maintainer>
   <license>MIT</license>
 
   <depend>rclpy</depend>

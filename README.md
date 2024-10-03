@@ -36,7 +36,8 @@ sudo chmod o+rw /dev/ttyUSB0  # Modify ttyUSB0 to your actual device name
 Edit `~/bashrc` and add virtual env lib path to PYTHONPATH 
 
 ```BASH
-export PYTHONPATH=$PYTHONPATH:~/ros2_ws/src/venv/lib/python3.12/site-packages 	# Modify python3.12 to your actual version
+export PYTHONPATH=$PYTHONPATH:~/ros2_ws/src/venv/lib/python3.12/site-packages 	# Modify python3.12 to your actual versioni
+source ~/.bashrc
 ```
 
 ## Node ROHand

@@ -4,7 +4,7 @@ package_name = 'rohand'
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='1.0.0',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/ament_index/resource_index/packages',
@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'rohand = rohand.rohand:main'
+            'rohand = rohand.rohand:main',
+            'rohand_teleop = rohand.rohand_teleop:main'
         ],
     },
 )

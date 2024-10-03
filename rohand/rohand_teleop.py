@@ -116,6 +116,7 @@ def restoreTerminalSettings(old_settings):
 
 
 def main(args=None):
+    STEP = 0.2
     setting = saveTerminalSettings()
 
     rclpy.init(args=args)  # 初始化rclpy
@@ -133,29 +134,29 @@ def main(args=None):
             node.get_logger().info('key {0} pressed'.format(key))
             match key:
                 case 'a':
-                    angles[0] += 1.0
+                    angles[0] += STEP 
                 case 'z':
-                    angles[0] -= 1.0
+                    angles[0] -= STEP 
                 case 's':
-                    angles[1] += 1.0
+                    angles[1] += STEP 
                 case 'x':
-                    angles[1] -= 1.0
+                    angles[1] -= STEP 
                 case 'd':
-                    angles[2] += 1.0
+                    angles[2] += STEP 
                 case 'c':
-                    angles[2] -= 1.0
+                    angles[2] -= STEP 
                 case 'f':
-                    angles[3] += 1.0
+                    angles[3] += STEP 
                 case 'v':
-                    angles[3] -= 1.0
+                    angles[3] -= STEP 
                 case 'g':
-                    angles[4] += 1.0
+                    angles[4] += STEP 
                 case 'b':
-                    angles[4] -= 1.0
+                    angles[4] -= STEP 
                 case 'h':
-                    angles[5] += 1.0
+                    angles[5] += STEP 
                 case 'n':
-                    angles[5] -= 1.0
+                    angles[5] -= STEP 
 
             node.update_angles(angles)
 

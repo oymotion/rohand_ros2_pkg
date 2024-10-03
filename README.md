@@ -7,7 +7,7 @@ Nodes for ROHand. One bus, i.e. one port need one node.
 cd ~
 mkdir -p ros2_ws/src 
 cd ros2/src
-git clone ssh://git@github.com/oymotion/rohand
+git clone ssh://git@github.com/oymotion/ros2_rohand
 ```
 
 ## Prepare

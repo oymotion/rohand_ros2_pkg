@@ -66,7 +66,7 @@ Listen to topic 'target_joint_state' and controls ROHand, reads current joint st
 source /path/to/workspace/install/bash
 
 # Run node
-ros2 run rohand rohand --ros-args -r __node:=bus1 -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2,3]
+ros2 run rohand rohand --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2,3]  # Modify parameters according to your real case
 ```
 ## Node rohand_teleop
 
@@ -85,7 +85,7 @@ Read keys to modify target joint angles, then publish to 'target_joint_state'.
 source /path/to/workspace/install/bash
 
 # Run node
-ros2 run rohand rohand_teleop --ros-args -r rohand_teleop_node/target_joint_states:=/rohand_node/target_joint_states -p hand_id:=2  # Modify hand_id according to your real case
+ros2 run rohand rohand_teleop --ros-args -r rohand_teleop_node/target_joint_states:=/rohand_node/target_joint_states -p hand_id:=2  # Modify parameters according to your real case
 ```
 
 Press following keys to operate:

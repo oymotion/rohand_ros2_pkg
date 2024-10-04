@@ -48,9 +48,37 @@ class ROHandNode(Node):
         #self._init_joint_states()
         self.pub_rate = self.create_rate(30)
 
-	# Initialize modbus 
+        # Initialize modbus
         self.modbus_client_ = ModbusSerialClient(port=self.port_name_, baudrate=self.baudrate_)
         self.modbus_client_.connect()
+
+        for i in range(10):
+            matched_cnt = 0
+
+            for hand_id in self.hand_ids_:
+                try:
+                    rr = self.modbus_client_.read_holding_registers(ROH_PROTOCOL_VERSION, count=1, slave=hand_id)
+                except ModbusException as exc:
+                    self.get_logger().error(f"ERROR: exception in pymodbus {exc}")
+                    continue
+
+                if rr.isError():
+                    self.get_logger().error(f"ERROR: pymodbus read request {rr}")
+                    continue
+
+                if (rr.registers[0] >> 8) == MODBUS_PROTOCOL_VERSION_MAJOR:
+                    matched_cnt += 1
+                else:
+                    self.get_logger().error("ERROR: major protocol version of rohand {0} is {1}, expected {2}".format(hand_id, rr.registers[0] >> 8, MODBUS_PROTOCOL_VERSION_MAJOR))
+                    raise Exception("Protocol version NOT matched")
+
+            if matched_cnt == len(self.hand_ids_):
+                break
+
+            time.sleep(1.0)
+
+        if (i == 10):
+            raise Exception("Get protocol version failed")
 
         self.thread_ = threading.Thread(target=self._thread_pub)
         self.thread_.start()
@@ -63,8 +91,8 @@ class ROHandNode(Node):
             hand_id = int(msg.header.frame_id.replace(FRAME_ID_PREFIX, ''))
         except ValueError as e:
             hand_id = 0
- 
-        self.get_logger().info("hand_id: %d(%s)" % (hand_id, type(hand_id)))
+
+        self.get_logger().info("hand_id: %d" % hand_id)
 
         if self.hand_ids_.index(hand_id) >= 0:
             # Set speed
@@ -143,7 +171,7 @@ class ROHandNode(Node):
                     for i in range(len(rr.registers)):
                         value = rr.registers[i]
                         if value > 32767:
-                            value -= 65536 
+                            value -= 65536
                         joint_states.position.append(value / 100)    # scale
 
 

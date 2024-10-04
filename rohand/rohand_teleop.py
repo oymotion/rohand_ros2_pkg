@@ -37,6 +37,7 @@ class ROHandTeleopNode(Node):
 
         self.hand_id_ = self.get_parameter_or('hand_id', Parameter('hand_id', Parameter.Type.INTEGER, 2)).value
         self.get_logger().info("hand_id: %d" % (self.hand_id_))
+        self.get_logger().info("'q' to exit, 'a', 'z', 's', 'x', 'd', 'c', 'f', 'v', 'g', 'b', 'h', 'n' to move fingers")
 
         # 创建并初始化发布者成员属性pub_joint_states_
         self.joint_states_publisher_ = self.create_publisher(msg_type=JointState, topic="~/target_joint_states", qos_profile=10)
@@ -50,11 +51,11 @@ class ROHandTeleopNode(Node):
 
 
     def _thread_pub(self):
-        last_update_time = time.time()
+        # last_update_time = time.time()
 
         while rclpy.ok():
-            delta_time = time.time() - last_update_time
-            last_update_time = time.time()
+            # delta_time = time.time() - last_update_time
+            # last_update_time = time.time()
 
             joint_states = JointState()
 
@@ -117,12 +118,18 @@ def restoreTerminalSettings(old_settings):
 
 def main(args=None):
     STEP = 0.2
+    INCREASE_KEYS = ['a', 's', 'd', 'f', 'g', 'h']
+    DECREASE_KEYS = ['z', 'x', 'c', 'v', 'b', 'n']
+    
+    MIN_JOINT_ANGLES = [-12.69, 91.00, 89.58, 89.47, 88.05, 0.00]
+    MAX_JOINT_ANGLES = [36.76, 180.91, 178.52, 179.04, 177.33, 90.00]
+
     setting = saveTerminalSettings()
 
     rclpy.init(args=args)  # 初始化rclpy
 
     node = ROHandTeleopNode()  # 新建一个节点
-    angles = [36.0, 174.0, 174.0, 174.0, 178.0, 0.0]
+    angles = [36.76, 180.91, 178.52, 179.04, 177.33, 0.0]
 
     while True:
         key = get_key(setting, 0.1)
@@ -130,35 +137,25 @@ def main(args=None):
         if key == 'q':
             break
 
-        if key in ['a', 'z', 's', 'x', 'd', 'c', 'f', 'v', 'g', 'b', 'h', 'n']:
+        try:
+            index = INCREASE_KEYS.index(key)
+        except ValueError:
+            index = -1 
+ 
+        if index >= 0:
             node.get_logger().info('key {0} pressed'.format(key))
-            match key:
-                case 'a':
-                    angles[0] += STEP 
-                case 'z':
-                    angles[0] -= STEP 
-                case 's':
-                    angles[1] += STEP 
-                case 'x':
-                    angles[1] -= STEP 
-                case 'd':
-                    angles[2] += STEP 
-                case 'c':
-                    angles[2] -= STEP 
-                case 'f':
-                    angles[3] += STEP 
-                case 'v':
-                    angles[3] -= STEP 
-                case 'g':
-                    angles[4] += STEP 
-                case 'b':
-                    angles[4] -= STEP 
-                case 'h':
-                    angles[5] += STEP 
-                case 'n':
-                    angles[5] -= STEP 
-
+            angles[index] = min(angles[index] + STEP, MAX_JOINT_ANGLES[index])
             node.update_angles(angles)
+        else:
+            try:
+                index = DECREASE_KEYS.index(key)
+            except ValueError:
+                index = -1 
+        
+            if index >= 0:
+                node.get_logger().info('key {0} pressed'.format(key))
+                angles[index] = max(angles[index] - STEP, MIN_JOINT_ANGLES[index])
+                node.update_angles(angles)
 
         rclpy.spin_once(node)  # 保持节点运行，检测是否收到退出指令（Ctrl+C）
 

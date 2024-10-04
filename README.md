@@ -2,7 +2,8 @@
 
 Nodes for ROHand. One bus, i.e. one port need one node.
 
-## 1. Clone 
+## 1. Clone
+
 ```BASH
 cd ~
 mkdir -p ros2_ws/src 
@@ -34,10 +35,10 @@ python3 -m pip install pymodbus
 sudo chmod o+rw /dev/ttyUSB0  # Modify ttyUSB0 to your actual device name
 ```
 
-Edit `~/bashrc` and add virtual env lib path to PYTHONPATH 
+Edit `~/bashrc` and add virtual env lib path to PYTHONPATH
 
 ```BASH
-export PYTHONPATH=$PYTHONPATH:~/ros2_ws/src/venv/lib/python3.12/site-packages 	# Modify python3.12 to your actual versioni
+export PYTHONPATH=$PYTHONPATH:~/ros2_ws/src/venv/lib/python3.12/site-packages  # Modify python3.12 to your actual versioni
 source ~/.bashrc
 ```
 
@@ -50,7 +51,7 @@ colcon build
 
 ## 4. Node rohand
 
-Listen to topic 'target_joint_state' and controls ROHand, reads current joint state and publish to 'current_joint_state'. 
+Listens to topic 'target_joint_state' and controls ROHand, reads current joint state and publish to 'current_joint_state'.
 
 ### 4.1 Topics
 
@@ -71,13 +72,13 @@ ros2 run rohand rohand --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=1152
 
 ## 5. Node rohand_teleop
 
-Read keys to modify target joint angles, then publish to 'target_joint_state'. 
+Reads keys to modify target joint angles, then publish to 'target_joint_state'.
 
 ### 5.1 Topics
 
-| Topic                 | Description                                                                              |
-| --------------------- | ---------------------------------------------------------------------------------------- |
-| "target_joint_state"  | target joint state in message type JointState, frame_id in header distinguishes hand id  |
+| Topic                | Description                                                                             |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| "target_joint_state" | target joint state in message type JointState, frame_id in header distinguishes hand id |
 
 ### 5.2 Run
 
@@ -91,18 +92,20 @@ ros2 run rohand rohand_teleop --ros-args -r rohand_teleop_node/target_joint_stat
 
 Press following keys to operate:
 
-| key | Description                |
-| --- | -------------------------- |
-| q   | quit                       |
-| a   | thumb bends by 1 degree    |
-| z   | thumb relaxes by 1 degree  |
-| s   | index bends by 1 degree    |
-| x   | index relaxes by 1 degree  |
-| d   | middle bends by 1 degree   |
-| c   | middle relaxes by 1 degree |
-| f   | ring bends by 1 degree     |
-| v   | ring relaxes by 1 degree   |
-| g   | little bends by 1 degree   |
-| b   | little relaxes by 1 degree |
-| h   | thumb rotation +1 degree   |
-| n   | thumb rotation -1 degree   |
+| key | Description            |
+| --- | ---------------------- |
+| q   | quit                   |
+| a   | thumb bends by step    |
+| z   | thumb relaxes by step  |
+| s   | index bends by step    |
+| x   | index relaxes by step  |
+| d   | middle bends by step   |
+| c   | middle relaxes by step |
+| f   | ring bends by step     |
+| v   | ring relaxes by step   |
+| g   | little bends by step   |
+| b   | little relaxes by step |
+| h   | thumb rotation +step   |
+| n   | thumb rotation -step   |
+
+Step is 0.2 degree.

@@ -30,7 +30,7 @@ source ./venv/bin/activate
 # Install python module
 python3 -m pip install pymodbus
 
-# Insert USB-485 module to USB port then add permition to users
+# Insert USB-485 module to USB port then add permission to users
 # Run following command every time you plug in your USB-485 module
 sudo chmod o+rw /dev/ttyUSB0  # Modify ttyUSB0 to your actual device name
 ```

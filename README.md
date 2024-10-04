@@ -2,15 +2,15 @@
 
 Nodes for ROHand. One bus, i.e. one port need one node.
 
-## Clone 
+## 1. Clone 
 ```BASH
 cd ~
 mkdir -p ros2_ws/src 
-cd ros2/src
+cd ros2_ws/src
 git clone ssh://git@github.com/oymotion/ros2_rohand
 ```
 
-## Prepare
+## 2. Prepare
 
 Install pymodbus
 
@@ -41,25 +41,25 @@ export PYTHONPATH=$PYTHONPATH:~/ros2_ws/src/venv/lib/python3.12/site-packages 	#
 source ~/.bashrc
 ```
 
-## Compile
+## 3. Compile
 
 ```BASH
 cd /path/to/workspace
 colcon build
 ```
 
-## Node rohand
+## 4. Node rohand
 
 Listen to topic 'target_joint_state' and controls ROHand, reads current joint state and publish to 'current_joint_state'. 
 
-### Topics
+### 4.1 Topics
 
 | Topic                 | Description                                                                              |
 | --------------------- | ---------------------------------------------------------------------------------------- |
 | "current_joint_state" | current joint state in message type JointState, frame_id in header distinguishes hand id |
 | "target_joint_state"  | target joint state in message type JointState, frame_id in header distinguishes hand id  |
 
-### Run
+### 4.2 Run
 
 ```BASH
 # Prepare package
@@ -68,17 +68,18 @@ source /path/to/workspace/install/bash
 # Run node
 ros2 run rohand rohand --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2,3]  # Modify parameters according to your real case
 ```
-## Node rohand_teleop
+
+## 5. Node rohand_teleop
 
 Read keys to modify target joint angles, then publish to 'target_joint_state'. 
 
-### Topics
+### 5.1 Topics
 
 | Topic                 | Description                                                                              |
 | --------------------- | ---------------------------------------------------------------------------------------- |
 | "target_joint_state"  | target joint state in message type JointState, frame_id in header distinguishes hand id  |
 
-### Run
+### 5.2 Run
 
 ```BASH
 # Prepare package
@@ -105,4 +106,3 @@ Press following keys to operate:
 | b   | little relaxes by 1 degree |
 | h   | thumb rotation +1 degree   |
 | n   | thumb rotation -1 degree   |
- 

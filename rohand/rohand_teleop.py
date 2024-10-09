@@ -67,7 +67,7 @@ class ROHandTeleopNode(Node):
             joint_states.position = self.angles_ 
 
             # Speed
-            joint_states.velocity = [65535, 65535, 65535, 65535, 65535, 65535]
+            joint_states.velocity = [65535.0, 65535.0, 65535.0, 65535.0, 65535.0, 65535.0]
 
             # TODO: force
             joint_states.effort = []

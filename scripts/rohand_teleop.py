@@ -117,12 +117,13 @@ def restoreTerminalSettings(old_settings):
 
 
 def main(args=None):
-    STEP = 0.2
+
     INCREASE_KEYS = ['a', 's', 'd', 'f', 'g', 'h']
     DECREASE_KEYS = ['z', 'x', 'c', 'v', 'b', 'n']
     
     MIN_JOINT_ANGLES = [-12.69, 91.00, 89.58, 89.47, 88.05, 0.00]
     MAX_JOINT_ANGLES = [36.76, 180.91, 178.52, 179.04, 177.33, 90.00]
+    STEPS = 10
 
     setting = saveTerminalSettings()
 
@@ -144,7 +145,7 @@ def main(args=None):
  
         if index >= 0:
             node.get_logger().info('key {0} pressed'.format(key))
-            angles[index] = min(angles[index] + STEP, MAX_JOINT_ANGLES[index])
+            angles[index] = min(angles[index] + (MAX_JOINT_ANGLES[index] - MIN_JOINT_ANGLES[index]) / STEPS, MAX_JOINT_ANGLES[index])
             node.update_angles(angles)
         else:
             try:
@@ -154,7 +155,7 @@ def main(args=None):
         
             if index >= 0:
                 node.get_logger().info('key {0} pressed'.format(key))
-                angles[index] = max(angles[index] - STEP, MIN_JOINT_ANGLES[index])
+                angles[index] = max(angles[index] - (MAX_JOINT_ANGLES[index] - MIN_JOINT_ANGLES[index]) / STEPS, MIN_JOINT_ANGLES[index])
                 node.update_angles(angles)
 
         rclpy.spin_once(node)  # 保持节点运行，检测是否收到退出指令（Ctrl+C）

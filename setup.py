@@ -20,8 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'rohand = rohand.rohand:main',
-            'rohand_teleop = rohand.rohand_teleop:main'
+            'rohand = scripts.rohand:main',
+            'rohand_teleop = scripts.rohand_teleop:main'
         ],
     },
 )

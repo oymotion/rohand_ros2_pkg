@@ -59,11 +59,11 @@ class ROHandNode(Node):
                 try:
                     rr = self.modbus_client_.read_holding_registers(ROH_PROTOCOL_VERSION, count=1, slave=hand_id)
                 except ModbusException as exc:
-                    self.get_logger().error(f"ERROR: exception in pymodbus {exc}")
+                    self.get_logger().error(f"ERROR: exception in pymodbus, {exc}")
                     continue
 
                 if rr.isError():
-                    self.get_logger().error(f"ERROR: pymodbus read request {rr}")
+                    self.get_logger().error(f"ERROR: pymodbus read request, {rr}")
                     continue
 
                 if (rr.registers[0] >> 8) == MODBUS_PROTOCOL_VERSION_MAJOR:
@@ -76,8 +76,8 @@ class ROHandNode(Node):
                 break
 
             time.sleep(1.0)
-
-        if (i == 10):
+            
+        if matched_cnt != len(self.hand_ids_):
             raise Exception("Get protocol version failed")
 
         self.thread_ = threading.Thread(target=self._thread_pub)
@@ -101,18 +101,24 @@ class ROHandNode(Node):
             for i in range(len(msg.velocity)):
                 values.append(int(msg.velocity[i]))
 
+            err_occurred = False
+            self.bus_mutex.acquire
+
             try:
-                self.bus_mutex.acquire
                 wr = self.modbus_client_.write_registers(address=ROH_FINGER_SPEED0, values=values, slave=hand_id)
-                self.bus_mutex.release
-            except ModbusException as exc:
-                self.get_logger().error(f"ERROR: exception in pymodbus {exc}")
+            except Exception as exc:
+                err_occurred = True
+                self.get_logger().error(f"ERROR: exception in pymodbus, {exc}")
                 # raise exc
-                return
+
+            self.bus_mutex.release
 
             if wr.isError():
+                err_occurred = True
                 self.get_logger().error(f"ERROR: pymodbus write_register returned an error: ({wr})")
                 # raise ModbusException(txt)
+
+            if err_occurred:
                 return
 
             # 设置目标位置
@@ -121,21 +127,28 @@ class ROHandNode(Node):
             for i in range(len(msg.position)):
                 value = int(msg.position[i] * 100)  # scale
                 if value < 0:
-                    value += 65535
+                    value += 65536
                 values.append(value)
 
+
+            err_occurred = False
+            self.bus_mutex.acquire
+
             try:
-                self.bus_mutex.acquire
                 wr = self.modbus_client_.write_registers(address=ROH_FINGER_ANGLE_TARGET0, values=values, slave=hand_id)
-                self.bus_mutex.release
-            except ModbusException as exc:
-                self.get_logger().error(f"ERROR: exception in pymodbus {exc}")
+            except Exception as exc:
+                err_occurred = True
+                self.get_logger().error(f"ERROR: exception in pymodbus, {exc}")
                 # raise exc
-                return
+
+            self.bus_mutex.release
 
             if wr.isError():
-                self.get_logger().error(f"ERROR: pymodbus returned an error: ({wr})")
+                err_occurred = True
+                self.get_logger().error(f"ERROR: pymodbus write_register returned an error: ({wr})")
                 # raise ModbusException(txt)
+
+            if err_occurred:
                 return
 
 

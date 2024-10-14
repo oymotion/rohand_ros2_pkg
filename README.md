@@ -6,9 +6,9 @@ Nodes for ROHand. One bus, i.e. one port need one node.
 
 ```BASH
 cd ~
-mkdir -p ros2_ws/src 
+mkdir -p ros2_ws/src
 cd ros2_ws/src
-git clone ssh://git@github.com/oymotion/ros2_rohand
+git clone ssh://git@github.com/oymotion/rohand_ros2_pkg
 ```
 
 ## 2. Prepare
@@ -29,10 +29,6 @@ source ./venv/bin/activate
 
 # Install python module
 python3 -m pip install pymodbus
-
-# Insert USB-485 module to USB port then add permission to users
-# Run following command every time you plug in your USB-485 module
-sudo chmod o+rw /dev/ttyUSB0  # Modify ttyUSB0 to your actual device name
 ```
 
 Edit `~/bashrc` and add virtual env lib path to PYTHONPATH
@@ -65,6 +61,10 @@ Listens to topic 'target_joint_state' and controls ROHand, reads current joint s
 ```BASH
 # Prepare package
 source /path/to/workspace/install/bash
+
+# Insert USB-485 module to USB port then add permission to users
+# Run following command every time you plug in your USB-485 module
+sudo chmod o+rw /dev/ttyUSB0  # Modify ttyUSB0 to your actual device name
 
 # Run node
 ros2 run rohand rohand --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2,3]  # Modify parameters according to your real case
@@ -108,4 +108,4 @@ Press following keys to operate:
 | h   | thumb rotation +step   |
 | n   | thumb rotation -step   |
 
-Step is 0.2 degree.
+Step is range / 10.

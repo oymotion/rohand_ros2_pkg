@@ -113,12 +113,12 @@ class ROHandNode(Node):
 
             self.bus_mutex.release
 
+            if err_occurred:
+                return
+
             if wr.isError():
-                err_occurred = True
                 self.get_logger().error(f"ERROR: pymodbus write_register returned an error: ({wr})")
                 # raise ModbusException(txt)
-
-            if err_occurred:
                 return
 
             # 设置目标位置
@@ -143,12 +143,12 @@ class ROHandNode(Node):
 
             self.bus_mutex.release
 
+            if err_occurred:
+                return
+
             if wr.isError():
-                err_occurred = True
                 self.get_logger().error(f"ERROR: pymodbus write_register returned an error: ({wr})")
                 # raise ModbusException(txt)
-
-            if err_occurred:
                 return
 
 

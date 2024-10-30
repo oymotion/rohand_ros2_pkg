@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'rohand = scripts.rohand:main',
+            'rohand_serial = scripts.rohand_serial:main',
             'rohand_teleop = scripts.rohand_teleop:main'
         ],
     },

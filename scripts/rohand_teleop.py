@@ -19,6 +19,10 @@ from sensor_msgs.msg import JointState
 
 FRAME_ID_PREFIX = 'rohand_'
 
+PUB_RATE = 10 
+
+STEPS = 1	# Moving steps for full range
+
 
 class ROHandTeleopNode(Node):
 
@@ -44,7 +48,7 @@ class ROHandTeleopNode(Node):
 
         # 初始化数据
         self.angles_ = [36.0, 174.0, 174.0, 174.0, 178.0, 0.0]
-        self.pub_rate = self.create_rate(30)
+        self.pub_rate = self.create_rate(PUB_RATE)
 
         self.pub_thread_ = threading.Thread(target=self._thread_pub)
         self.pub_thread_.start()
@@ -123,7 +127,6 @@ def main(args=None):
     
     MIN_JOINT_ANGLES = [-12.69, 91.00, 89.58, 89.47, 88.05, 0.00]
     MAX_JOINT_ANGLES = [36.76, 180.91, 178.52, 179.04, 177.33, 90.00]
-    STEPS = 10
 
     setting = saveTerminalSettings()
 
@@ -133,7 +136,7 @@ def main(args=None):
     angles = [36.76, 180.91, 178.52, 179.04, 177.33, 0.0]
 
     while True:
-        key = get_key(setting, 0.1)
+        key = get_key(setting, 1 / PUB_RATE)
 
         if key == 'q':
             break

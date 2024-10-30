@@ -47,6 +47,7 @@ colcon build
 
 ## 4. Node rohand
 
+ROHand node for ModBus-RTU Protocol. Please confirm protocol type in OHandSetting.
 Listens to topic 'target_joint_state' and controls ROHand, reads current joint state and publish to 'current_joint_state'.
 
 ### 4.1 Topics
@@ -70,17 +71,43 @@ sudo chmod o+rw /dev/ttyUSB0  # Modify ttyUSB0 to your actual device name
 ros2 run rohand rohand --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2,3]  # Modify parameters according to your real case
 ```
 
-## 5. Node rohand_teleop
+## 5. Node rohand_serial
+
+ROHand node for Serial Control Protocol. Please confirm protocol type in OHandSetting.
+Listens to topic 'target_joint_state' and controls ROHand, reads current joint state and publish to 'current_joint_state'.
+
+### 5.1 Topics
+
+| Topic                 | Description                                                                              |
+| --------------------- | ---------------------------------------------------------------------------------------- |
+| "current_joint_state" | current joint state in message type JointState, frame_id in header distinguishes hand id |
+| "target_joint_state"  | target joint state in message type JointState, frame_id in header distinguishes hand id  |
+
+### 5.2 Run
+
+```BASH
+# Prepare package
+source /path/to/workspace/install/bash
+
+# Insert USB-485 module to USB port then add permission to users
+# Run following command every time you plug in your USB-485 module
+sudo chmod o+rw /dev/ttyUSB0  # Modify ttyUSB0 to your actual device name
+
+# Run node
+ros2 run rohand rohand --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2,3]  # Modify parameters according to your real case
+```
+
+## 6. Node rohand_teleop
 
 Reads keys to modify target joint angles, then publish to 'target_joint_state'.
 
-### 5.1 Topics
+### 6.1 Topics
 
 | Topic                | Description                                                                             |
 | -------------------- | --------------------------------------------------------------------------------------- |
 | "target_joint_state" | target joint state in message type JointState, frame_id in header distinguishes hand id |
 
-### 5.2 Run
+### 6.2 Run
 
 ```BASH
 # Prepare package

@@ -81,7 +81,7 @@ class ROHandNode(Node):
             raise Exception("Get protocol version failed")
 
         self.thread_ = threading.Thread(target=self._thread_pub)
-        self.thread_.start()
+        #self.thread_.start()
 
 
     def _joint_states_callback(self, msg):
@@ -104,22 +104,22 @@ class ROHandNode(Node):
             err_occurred = False
             self.bus_mutex.acquire
 
-            try:
-                wr = self.modbus_client_.write_registers(address=ROH_FINGER_SPEED0, values=values, slave=hand_id)
-            except Exception as exc:
-                err_occurred = True
-                self.get_logger().error(f"ERROR: exception in pymodbus, {exc}")
-                # raise exc
+            #try:
+            #    wr = self.modbus_client_.write_registers(address=ROH_FINGER_SPEED0, values=values, slave=hand_id)
+            #except Exception as exc:
+            #    err_occurred = True
+            #    self.get_logger().error(f"ERROR: exception in pymodbus, {exc}")
+            #    # raise exc
 
-            self.bus_mutex.release
+            #self.bus_mutex.release
 
-            if err_occurred:
-                return
+            #if err_occurred:
+            #    return
 
-            if wr.isError():
-                self.get_logger().error(f"ERROR: pymodbus write_register returned an error: ({wr})")
-                # raise ModbusException(txt)
-                return
+            #if wr.isError():
+            #    self.get_logger().error(f"ERROR: pymodbus write_register returned an error: ({wr})")
+            #    # raise ModbusException(txt)
+            #    return
 
             # 设置目标位置
             values = []

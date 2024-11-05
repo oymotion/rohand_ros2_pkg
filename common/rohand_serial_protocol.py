@@ -493,35 +493,35 @@ class OHandProtocol:
             position = []
             for i in range(motor_cnt):
                 value = data[offset] | (data[offset + 1] << 8)
-                position.append(value)
+                position.append(float(value))
                 offset += 2
 
         if (data_flag & SUB_CMD_GET_ANGLE):
             angle = []
             for i in range(motor_cnt):
                 value = data[offset] | (data[offset + 1] << 8)
-                angle.append(value)
+                angle.append(float(value))
                 offset += 2
 
         if (data_flag & SUB_CMD_GET_CURRENT):
             current = []
             for i in range(motor_cnt):
                 value = data[offset] | (data[offset + 1] << 8)
-                current.append(value)
+                current.append(float(value))
                 offset += 2
 
         if (data_flag & SUB_CMD_GET_FORCE):
             force = []
             for i in range(motor_cnt):
                 value = data[offset] | (data[offset + 1] << 8)
-                force.append(value)
+                force.append(float(value))
                 offset += 2
 
         if (data_flag & SUB_CMD_GET_STATUS):
             status = []
             for i in range(motor_cnt):
                 value = data[offset]
-                status.append(value)
+                status.append(int(value))
                 offset += 1
 
         return err, remote_err, position, angle, current, force, status

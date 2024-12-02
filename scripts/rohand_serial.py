@@ -12,36 +12,36 @@ from sensor_msgs.msg import JointState
 from common.rohand_serial_protocol import *
 
 
-FRAME_ID_PREFIX = 'rohand_'
+FRAME_ID_PREFIX = "rohand_"
 
-PUB_RATE = 30 # Hz
+PUB_RATE = 30  # Hz
 
 
 class ROHandSerialNode(Node):
 
     def __init__(self):
-        super().__init__('rohand_node')
+        super().__init__("rohand_node")
 
         self.get_logger().info("node %s init.." % self.get_name())
 
         self.declare_parameters(
-            namespace='',
+            namespace="",
             parameters=[
-                ('port_name', Parameter.Type.STRING),
-                ('baudrate', Parameter.Type.INTEGER),
-                ('hand_ids', Parameter.Type.INTEGER_ARRAY)
-            ]
+                ("port_name", Parameter.Type.STRING),
+                ("baudrate", Parameter.Type.INTEGER),
+                ("hand_ids", Parameter.Type.INTEGER_ARRAY),
+            ],
         )
 
-        self.port_name_ = self.get_parameter_or('port_name', Parameter('port_name', Parameter.Type.STRING, "/dev/ttyUSB0")).value
-        self.baudrate_ = self.get_parameter_or('baudrate', Parameter('baudrate', Parameter.Type.INTEGER, 115200)).value
-        self.hand_ids_ = self.get_parameter_or('hand_ids', Parameter('hand_ids', Parameter.Type.INTEGER_ARRAY, [2])).value
+        self.port_name_ = self.get_parameter_or("port_name", Parameter("port_name", Parameter.Type.STRING, "/dev/ttyUSB0")).value
+        self.baudrate_ = self.get_parameter_or("baudrate", Parameter("baudrate", Parameter.Type.INTEGER, 115200)).value
+        self.hand_ids_ = self.get_parameter_or("hand_ids", Parameter("hand_ids", Parameter.Type.INTEGER_ARRAY, [2])).value
         self.get_logger().info("port: %s, baudrate: %d, hand_ids: %s" % (self.port_name_, self.baudrate_, str(self.hand_ids_)))
 
         self.position_ = []
         self.velocity_ = []
         self.effort_ = []
-        self.data_time_ = time.time() - 1000    # Out of date
+        self.data_time_ = time.time() - 1000  # Out of date
 
         serial_port = serial.Serial(
             port=self.port_name_,
@@ -49,7 +49,7 @@ class ROHandSerialNode(Node):
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS,
-            timeout=3
+            timeout=3,
         )
 
         if not serial_port.is_open:
@@ -58,13 +58,15 @@ class ROHandSerialNode(Node):
         self.get_logger().info(f"serial port '{self.port_name_}' opened: {serial_port.is_open}")
 
         # 创建并初始化发布者成员属性pub_joint_states_
-        self.joint_states_subscriber_ = self.create_subscription(msg_type=JointState, topic="~/target_joint_states", callback=self._joint_states_callback, qos_profile=10)
+        self.joint_states_subscriber_ = self.create_subscription(
+            msg_type=JointState, topic="~/target_joint_states", callback=self._joint_states_callback, qos_profile=10
+        )
 
         # 创建并初始化发布者成员属性pub_joint_states_
         self.joint_states_publisher_ = self.create_publisher(msg_type=JointState, topic="~/current_joint_states", qos_profile=10)
 
         # 初始化数据
-        #self._init_joint_states()
+        # self._init_joint_states()
         self.pub_rate = self.create_rate(PUB_RATE)
 
         # Initialize bus context
@@ -89,7 +91,9 @@ class ROHandSerialNode(Node):
                 if major == PROTOCOL_VERSION_MAJOR:
                     matched_cnt += 1
                 else:
-                    self.get_logger().error(f"major protocol version of rohand '{hand_id}' is '{major}', expected '{PROTOCOL_VERSION_MAJOR}'")
+                    self.get_logger().error(
+                        f"major protocol version of rohand '{hand_id}' is '{major}', expected '{PROTOCOL_VERSION_MAJOR}'"
+                    )
                     raise Exception("Protocol version NOT matched")
 
             if matched_cnt == len(self.hand_ids_):
@@ -103,12 +107,11 @@ class ROHandSerialNode(Node):
         self.thread_ = threading.Thread(target=self._thread_pub)
         self.thread_.start()
 
-
     def _joint_states_callback(self, msg):
         self.get_logger().info("I heard: %s" % msg)
 
         try:
-            hand_id = int(msg.header.frame_id.replace(FRAME_ID_PREFIX, ''))
+            hand_id = int(msg.header.frame_id.replace(FRAME_ID_PREFIX, ""))
         except ValueError as e:
             hand_id = -1
 
@@ -121,14 +124,15 @@ class ROHandSerialNode(Node):
 
         if index >= 0:
             # Send to OHand and read
-            err, remote_err, position, angle, current, force, status = self.rohand_protocol.set_custom(hand_id, speed=msg.velocity, angle=msg.position, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_CURRENT)
+            err, remote_err, position, angle, current, force, status = self.rohand_protocol.set_custom(
+                hand_id, speed=msg.velocity, angle=msg.position, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_FORCE
+            )
 
             if err == HAND_RESP_SUCCESS:
                 self.position_ = angle if angle is not None else []
-                self.velocity_ = [] # TODO: Calculate speed according to position diff and time
-                self.effort_ = current if current is not None else []
+                self.velocity_ = []  # TODO: Calculate speed according to position diff and time
+                self.effort_ = force if force is not None else []
                 self.data_time_ = time.time()
-
 
     def _thread_pub(self):
 
@@ -138,17 +142,19 @@ class ROHandSerialNode(Node):
 
                 joint_states.header.stamp = self.get_clock().now().to_msg()
                 joint_states.header.frame_id = FRAME_ID_PREFIX + str(hand_id)
-                joint_states.name = ['thumb', 'index', 'middle', 'ring', 'little', 'thumb_rotation']
+                joint_states.name = ["thumb", "index", "middle", "ring", "little", "thumb_rotation"]
 
                 if time.time() - self.data_time_ > 0.5 / PUB_RATE:
-                    err, remote_err, position, angle, current, force, status = self.rohand_protocol.set_custom(hand_id, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_CURRENT)
+                    err, remote_err, position, angle, current, force, status = self.rohand_protocol.set_custom(
+                        hand_id, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_FORCE
+                    )
 
                     if err != HAND_RESP_SUCCESS:
                         continue
 
                     joint_states.position = angle if angle is not None else []
                     joint_states.velocity = []  # TODO: Calculate speed according to position diff and time
-                    joint_states.effort = current if current is not None else []
+                    joint_states.effort = force if force is not None else []
                 else:
                     # Use still fresh data
                     joint_states.position = self.position_

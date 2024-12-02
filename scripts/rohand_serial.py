@@ -121,12 +121,12 @@ class ROHandSerialNode(Node):
 
         if index >= 0:
             # Send to OHand and read
-            err, remote_err, position, angle, current, force, status = self.rohand_protocol.set_custom(hand_id, speed=msg.velocity, angle=msg.position, get_flag=SUB_CMD_GET_ANGLE)
+            err, remote_err, position, angle, current, force, status = self.rohand_protocol.set_custom(hand_id, speed=msg.velocity, angle=msg.position, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_CURRENT)
 
             if err == HAND_RESP_SUCCESS:
                 self.position_ = angle if angle is not None else []
                 self.velocity_ = [] # TODO: Calculate speed according to position diff and time
-                self.effort_ = force if force is not None else []
+                self.effort_ = current if current is not None else []
                 self.data_time_ = time.time()
 
 
@@ -141,14 +141,14 @@ class ROHandSerialNode(Node):
                 joint_states.name = ['thumb', 'index', 'middle', 'ring', 'little', 'thumb_rotation']
 
                 if time.time() - self.data_time_ > 0.5 / PUB_RATE:
-                    err, remote_err, position, angle, current, force, status = self.rohand_protocol.set_custom(hand_id, get_flag=SUB_CMD_GET_ANGLE)
+                    err, remote_err, position, angle, current, force, status = self.rohand_protocol.set_custom(hand_id, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_CURRENT)
 
                     if err != HAND_RESP_SUCCESS:
                         continue
 
                     joint_states.position = angle if angle is not None else []
                     joint_states.velocity = []  # TODO: Calculate speed according to position diff and time
-                    joint_states.effort = force if force is not None else []
+                    joint_states.effort = current if current is not None else []
                 else:
                     # Use still fresh data
                     joint_states.position = self.position_

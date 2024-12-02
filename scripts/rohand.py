@@ -81,7 +81,7 @@ class ROHandNode(Node):
             raise Exception("Get protocol version failed")
 
         self.thread_ = threading.Thread(target=self._thread_pub)
-        #self.thread_.start()
+        self.thread_.start()
 
 
     def _joint_states_callback(self, msg):
@@ -192,7 +192,23 @@ class ROHandNode(Node):
                 joint_states.velocity = []
 
                 # TODO: Read current forces
-                joint_states.effort = []
+                try:
+                    self.bus_mutex.acquire
+                    rr = self.modbus_client_.read_holding_registers(ROH_FINGER_CURRENT0, count=6, slave=hand_id)
+                    self.bus_mutex.release
+                except ModbusException as exc:
+                    self.get_logger().error(f"ERROR: exception in pymodbus {exc}")
+                    # raise exc
+                    time.sleep(1.0)
+                    continue
+
+                if rr.isError():
+                    self.get_logger().error(f"ERROR: pymodbus read_holding_registers() returned an error: ({rr})")
+                    # raise ModbusException(txt)
+                else:
+                    for i in range(len(rr.registers)):
+                        value = rr.registers[i]
+                        joint_states.effort.append(value)
 
                 self.bus_mutex.release
 

@@ -8,6 +8,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.parameter import Parameter
 from sensor_msgs.msg import JointState
+from std_msgs.msg import UInt8MultiArray
 
 from common.rohand_serial_protocol import *
 
@@ -42,6 +43,7 @@ class ROHandSerialNode(Node):
         self.velocity_ = []
         self.effort_ = []
         self.data_time_ = time.time() - 1000  # Out of date
+        self.status_ = []
 
         serial_port = serial.Serial(
             port=self.port_name_,
@@ -64,6 +66,9 @@ class ROHandSerialNode(Node):
 
         # 创建并初始化发布者成员属性pub_joint_states_
         self.joint_states_publisher_ = self.create_publisher(msg_type=JointState, topic="~/current_joint_states", qos_profile=10)
+        
+        # 创建并初始化发布者成员属性pub_finger_states_
+        self.finger_states_publihser_ = self.create_publisher(msg_type=UInt8MultiArray, topic="~/finger_state", qos_profile=10)
 
         # 初始化数据
         # self._init_joint_states()
@@ -125,7 +130,7 @@ class ROHandSerialNode(Node):
         if index >= 0:
             # Send to OHand and read
             err, remote_err, position, angle, current, force, status = self.rohand_protocol.set_custom(
-                hand_id, speed=msg.velocity, angle=msg.position, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_FORCE
+                hand_id, speed=msg.velocity, angle=msg.position, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_FORCE | SUB_CMD_GET_STATUS
             )
 
             if err == HAND_RESP_SUCCESS:
@@ -133,12 +138,14 @@ class ROHandSerialNode(Node):
                 self.velocity_ = []  # TODO: Calculate speed according to position diff and time
                 self.effort_ = force if force is not None else []
                 self.data_time_ = time.time()
+                self.status_ = status
 
     def _thread_pub(self):
 
         while rclpy.ok():
             for hand_id in self.hand_ids_:
                 joint_states = JointState()
+                finger_states = UInt8MultiArray()
 
                 joint_states.header.stamp = self.get_clock().now().to_msg()
                 joint_states.header.frame_id = FRAME_ID_PREFIX + str(hand_id)
@@ -146,7 +153,7 @@ class ROHandSerialNode(Node):
 
                 if time.time() - self.data_time_ > 0.5 / PUB_RATE:
                     err, remote_err, position, angle, current, force, status = self.rohand_protocol.set_custom(
-                        hand_id, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_FORCE
+                        hand_id, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_FORCE | SUB_CMD_GET_STATUS
                     )
 
                     if err != HAND_RESP_SUCCESS:
@@ -155,17 +162,24 @@ class ROHandSerialNode(Node):
                     joint_states.position = angle if angle is not None else []
                     joint_states.velocity = []  # TODO: Calculate speed according to position diff and time
                     joint_states.effort = force if force is not None else []
+                    
+                    finger_states.data = status
+                    
                 else:
                     # Use still fresh data
                     joint_states.position = self.position_
                     joint_states.velocity = self.velocity_
                     joint_states.effort = self.effort_
+                    finger_states.data = self.status_
 
                 # 更新 header
                 joint_states.header.stamp = self.get_clock().now().to_msg()
 
                 # 发布关节数据
                 self.joint_states_publisher_.publish(joint_states)
+                
+                # 发布手指状态数据
+                self.finger_states_publihser_.publish(finger_states)
 
             self.pub_rate.sleep()
 

@@ -82,6 +82,7 @@ Listens to topic 'target_joint_state' and controls ROHand, reads current joint s
 | --------------------- | ---------------------------------------------------------------------------------------- |
 | "current_joint_state" | current joint state in message type JointState, frame_id in header distinguishes hand id |
 | "target_joint_state"  | target joint state in message type JointState, frame_id in header distinguishes hand id  |
+| "finger_state"        | finger status in message type UInt8MultiArray                                            |
 
 ### 5.2 Run
 
@@ -96,6 +97,17 @@ sudo chmod o+rw /dev/ttyUSB0  # Modify ttyUSB0 to your actual device name
 # Run node
 ros2 run rohand rohand_serial --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2,3]  # Modify parameters according to your real case
 ```
+
+Finger status code:
+
+| Name                 | Code  | Description                |
+| -------------------- | :---: | -------------------------- |
+| STATUS_OPENING       |   0   | Spreading                  |
+| STATUS_CLOSING       |   1   | Grasping                   |
+| STATUS_POS_REACHED   |   2   | Position reached stop      |
+| STATUS_OVER_CURRENT  |   3   | Current protection stop    |
+| STATUS_FORCE_REACHED |   4   | Force control reached stop |
+| STATUS_STUCK         |   5   | Motor stuck stop           |
 
 ## 6. Node rohand_teleop
 

@@ -47,7 +47,7 @@ colcon build
 
 ## 4. Node rohand
 
-ROHand node for ModBus-RTU Protocol. Please confirm protocol type in OHandSetting.
+ROHand node for ModBus-RTU or ModBus-RTU & SerialCtrl Dual Protocol. Please confirm protocol type in OHandSetting.
 Listens to topic 'target_joint_state' and controls ROHand, reads current joint state and publish to 'current_joint_state'.
 
 ### 4.1 Topics
@@ -73,7 +73,7 @@ ros2 run rohand rohand --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=1152
 
 ## 5. Node rohand_serial
 
-ROHand node for Serial Control Protocol. Please confirm protocol type in OHandSetting.
+ROHand node for SerialCtrl Protocol, Dual Protocol is NOT supported. Please confirm protocol type in OHandSetting.
 Listens to topic 'target_joint_state' and controls ROHand, reads current joint state and publish to 'current_joint_state'.
 
 ### 5.1 Topics

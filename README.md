@@ -34,7 +34,7 @@ python3 -m pip install pymodbus
 Edit `~/bashrc` and add virtual env lib path to PYTHONPATH
 
 ```BASH
-export PYTHONPATH=$PYTHONPATH:~/ros2_ws/src/venv/lib/python3.12/site-packages  # Modify python3.12 to your actual versioni
+export PYTHONPATH=$PYTHONPATH:~/ros2_ws/src/venv/lib/python3.12/site-packages  # Modify python3.12 to your actual version
 source ~/.bashrc
 ```
 
@@ -67,8 +67,16 @@ source /path/to/workspace/install/bash
 # Run following command every time you plug in your USB-485 module
 sudo chmod o+rw /dev/ttyUSB0  # Modify ttyUSB0 to your actual device name
 
-# Run node
-ros2 run rohand rohand --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2,3]  # Modify parameters according to your real case
+# Run ROHand node according to your type
+#
+# Run ROH-A001 node
+ros2 run rohand rohand_modbus_a001 --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2]  # Modify parameters according to your real case
+
+# Run ROH-AP001 node
+ros2 run rohand rohand_modbus_ap001 --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2]  # Modify parameters according to your real case
+
+# Run ROH-LiteS001 node
+ros2 run rohand rohand_modbus_lites001 --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2]  # Modify parameters according to your real case
 ```
 
 ## 5. Node rohand_serial
@@ -94,8 +102,16 @@ source /path/to/workspace/install/bash
 # Run following command every time you plug in your USB-485 module
 sudo chmod o+rw /dev/ttyUSB0  # Modify ttyUSB0 to your actual device name
 
-# Run node
-ros2 run rohand rohand_serial --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2,3]  # Modify parameters according to your real case
+# Run ROHand node according to your type
+#
+# Run ROH-A001 node
+ros2 run rohand rohand_serial_a001 --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2]  # Modify parameters according to your real case
+
+# Run ROH-AP001 node
+ros2 run rohand rohand_serial_ap001 --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2]  # Modify parameters according to your real case
+
+# Run ROH-LiteS001 node
+ros2 run rohand rohand_serial_lites001 --ros-args -p port_name:="/dev/ttyUSB0" -p baudrate:=115200 -p hand_ids:=[2]  # Modify parameters according to your real case
 ```
 
 Finger status code:
@@ -125,8 +141,16 @@ Reads keys to modify target joint angles, then publish to 'target_joint_state'.
 # Prepare package
 source /path/to/workspace/install/bash
 
-# Run node
-ros2 run rohand rohand_teleop --ros-args -r rohand_teleop_node/target_joint_states:=/rohand_node/target_joint_states -p hand_id:=2  # Modify parameters according to your real case
+# Run ROHand node according to your type
+#
+# Run ROH-LiteS001 node
+ros2 run rohand rohand_teleop_a001 --ros-args -r rohand_teleop_node/target_joint_states:=/rohand_node/target_joint_states -p hand_id:=2  # Modify parameters according to your real case
+
+# Run ROH-LiteS001 node
+ros2 run rohand rohand_teleop_ap001 --ros-args -r rohand_teleop_node/target_joint_states:=/rohand_node/target_joint_states -p hand_id:=2  # Modify parameters according to your real case
+
+# Run ROH-LiteS001 node
+ros2 run rohand rohand_teleop_lites001 --ros-args -r rohand_teleop_node/target_joint_states:=/rohand_node/target_joint_states -p hand_id:=2  # Modify parameters according to your real case
 ```
 
 Press following keys to operate:

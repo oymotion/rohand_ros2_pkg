@@ -20,9 +20,15 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'rohand = scripts.rohand:main',
-            'rohand_serial = scripts.rohand_serial:main',
-            'rohand_teleop = scripts.rohand_teleop:main'
+            'rohand_modbus_a001 = scripts.roh_a001_node.rohand_modbus:main',
+            'rohand_serial_a001 = scripts.roh_a001_node.rohand_serial:main',
+            'rohand_teleop_a001 = scripts.roh_a001_node.rohand_teleop:main',
+            'rohand_modbus_ap001 = scripts.roh_ap001_node.rohand_modbus:main',
+            'rohand_serial_ap001 = scripts.roh_ap001_node.rohand_serial:main',
+            'rohand_teleop_ap001 = scripts.roh_ap001_node.rohand_teleop:main',
+            'rohand_modbus_lites001 = scripts.roh_lites001_node.rohand_modbus:main',
+            'rohand_serial_lites001 = scripts.roh_lites001_node.rohand_serial:main',
+            'rohand_teleop_lites001 = scripts.roh_lites001_node.rohand_teleop:main',
         ],
     },
 )

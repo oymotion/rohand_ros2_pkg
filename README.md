@@ -45,7 +45,7 @@ cd /path/to/workspace
 colcon build
 ```
 
-## 4. Node rohand
+## 4. Node rohand_modbus
 
 ROHand node for ModBus-RTU or ModBus-RTU & SerialCtrl Dual Protocol. Please confirm protocol type in OHandSetting.
 Listens to topic 'target_joint_state' and controls ROHand, reads current joint state and publish to 'current_joint_state'.

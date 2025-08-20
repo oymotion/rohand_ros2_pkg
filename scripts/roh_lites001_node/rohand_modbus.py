@@ -192,26 +192,26 @@ class ROHandNode(Node):
                 # TODO：读取当前速度
                 joint_states.velocity = []
 
-                # TODO: Read current forces
-                try:
-                    self.bus_mutex.acquire
-                    rr = self.modbus_client_.read_holding_registers(ROH_FINGER_FORCE0, count=6, device_id=hand_id)
-                    self.bus_mutex.release
-                except ModbusException as exc:
-                    self.get_logger().error(f"ERROR: exception in pymodbus {exc}")
-                    # raise exc
-                    time.sleep(1.0)
-                    continue
+                # TODO: Read current forces, reserved.
+                # try:
+                #     self.bus_mutex.acquire
+                #     rr = self.modbus_client_.read_holding_registers(ROH_FINGER_FORCE0, count=6, device_id=hand_id)
+                #     self.bus_mutex.release
+                # except ModbusException as exc:
+                #     self.get_logger().error(f"ERROR: exception in pymodbus {exc}")
+                #     # raise exc
+                #     time.sleep(1.0)
+                #     continue
 
-                if rr.isError():
-                    self.get_logger().error(f"ERROR: pymodbus read_holding_registers() returned an error: ({rr})")
-                    # raise ModbusException(txt)
-                else:
-                    for i in range(len(rr.registers)):
-                        value = rr.registers[i]
-                        joint_states.effort.append(value)
+                # if rr.isError():
+                #     self.get_logger().error(f"ERROR: pymodbus read_holding_registers() returned an error: ({rr})")
+                #     # raise ModbusException(txt)
+                # else:
+                #     for i in range(len(rr.registers)):
+                #         value = rr.registers[i]
+                #         joint_states.effort.append(value)
 
-                self.bus_mutex.release
+                # self.bus_mutex.release
 
                 # 更新 header
                 joint_states.header.stamp = self.get_clock().now().to_msg()

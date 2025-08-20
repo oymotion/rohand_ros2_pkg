@@ -130,7 +130,7 @@ class ROHandSerialNode(Node):
         if index >= 0:
             # Send to OHand and read
             err, remote_err, position, angle, current, force, status = self.rohand_protocol.set_custom(
-                hand_id, speed=msg.velocity, angle=msg.position, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_FORCE | SUB_CMD_GET_STATUS
+                hand_id, speed=msg.velocity, angle=msg.position, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_STATUS
             )
 
             if err == HAND_RESP_SUCCESS:
@@ -153,7 +153,7 @@ class ROHandSerialNode(Node):
 
                 if time.time() - self.data_time_ > 0.5 / PUB_RATE:
                     err, remote_err, position, angle, current, force, status = self.rohand_protocol.set_custom(
-                        hand_id, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_FORCE | SUB_CMD_GET_STATUS
+                        hand_id, get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_STATUS
                     )
 
                     if err != HAND_RESP_SUCCESS:

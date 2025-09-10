@@ -28,7 +28,7 @@ touch ./venv/COLCON_IGNORE
 source ./venv/bin/activate
 
 # Install python module
-python3 -m pip install pymodbus
+python3 -m pip install pymodbus==3.10.0 pyserial==3.5
 ```
 
 Edit `~/bashrc` and add virtual env lib path to PYTHONPATH

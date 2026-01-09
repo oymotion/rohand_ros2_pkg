@@ -118,8 +118,6 @@ class ROHandSerialNode(Node):
             	
         except ValueError as e:
             hand_id = -1
-
-        self.get_logger().info("hand_id: %d" % hand_id)
         
         try:
             index = self.hand_ids_.index(hand_id)
@@ -133,12 +131,12 @@ class ROHandSerialNode(Node):
             )
 
 
-                if err == HAND_RESP_SUCCESS:
-                    self.position_ = angle if angle is not None else []
-                    self.velocity_ = []  # TODO: Calculate speed according to position diff and time
-                    self.effort_ = force if force is not None else []
-                    self.data_time_ = time.time()
-                    self.status_ = status if status is not None else []
+            if err == HAND_RESP_SUCCESS:
+                self.position_ = angle if angle is not None else []
+                self.velocity_ = []  # TODO: Calculate speed according to position diff and time
+                self.effort_ = force if force is not None else []
+                self.data_time_ = time.time()
+                self.status_ = status if status is not None else []
 
     def _thread_pub(self):
 
@@ -156,14 +154,14 @@ class ROHandSerialNode(Node):
                         self.hand_ids_[i], self.master_ids_[i], get_flag=SUB_CMD_GET_ANGLE | SUB_CMD_GET_STATUS
                     )
 
-                        if err != HAND_RESP_SUCCESS:
-                            continue
+                    if err != HAND_RESP_SUCCESS:
+                        continue
 
-                        joint_states.position = angle if angle is not None else []
-                        joint_states.velocity = []  # TODO: Calculate speed according to position diff and time
-                        joint_states.effort = force if force is not None else []
-                        
-                        finger_states.data = status if status is not None else []
+                    joint_states.position = angle if angle is not None else []
+                    joint_states.velocity = []  # TODO: Calculate speed according to position diff and time
+                    joint_states.effort = force if force is not None else []
+                    
+                    finger_states.data = status if status is not None else []
                     
                 else:
                     # Use still fresh data

@@ -58,7 +58,7 @@ class ROHandNode(Node):
 
             for hand_id in self.hand_ids_:
                 try:
-                    rr = self.modbus_client_.read_holding_registers(ROH_PROTOCOL_VERSION, count=1, device_id=hand_id)
+                    rr = self.modbus_client_.read_holding_registers(ROH_PROTOCOL_VERSION, count=1, slave=hand_id)
                 except ModbusException as exc:
                     self.get_logger().error(f"ERROR: exception in pymodbus, {exc}")
                     continue
@@ -106,7 +106,7 @@ class ROHandNode(Node):
             self.bus_mutex.acquire
 
             #try:
-            #    wr = self.modbus_client_.write_registers(address=ROH_FINGER_SPEED0, values=values, device_id=hand_id)
+            #    wr = self.modbus_client_.write_registers(address=ROH_FINGER_SPEED0, values=values, slave=hand_id)
             #except Exception as exc:
             #    err_occurred = True
             #    self.get_logger().error(f"ERROR: exception in pymodbus, {exc}")
@@ -136,7 +136,7 @@ class ROHandNode(Node):
             self.bus_mutex.acquire
 
             try:
-                wr = self.modbus_client_.write_registers(address=ROH_FINGER_ANGLE_TARGET0, values=values, device_id=hand_id)
+                wr = self.modbus_client_.write_registers(address=ROH_FINGER_ANGLE_TARGET0, values=values, slave=hand_id)
             except Exception as exc:
                 err_occurred = True
                 self.get_logger().error(f"ERROR: exception in pymodbus, {exc}")
@@ -170,7 +170,7 @@ class ROHandNode(Node):
                 # 读取当前位置
                 try:
                     self.bus_mutex.acquire
-                    rr = self.modbus_client_.read_holding_registers(ROH_FINGER_ANGLE0, count=6, device_id=hand_id)
+                    rr = self.modbus_client_.read_holding_registers(ROH_FINGER_ANGLE0, count=6, slave=hand_id)
                     self.bus_mutex.release
                 except ModbusException as exc:
                     self.get_logger().error(f"ERROR: exception in pymodbus {exc}")
@@ -195,7 +195,7 @@ class ROHandNode(Node):
                 # TODO: Read current forces, reserved.
                 # try:
                 #     self.bus_mutex.acquire
-                #     rr = self.modbus_client_.read_holding_registers(ROH_FINGER_FORCE0, count=6, device_id=hand_id)
+                #     rr = self.modbus_client_.read_holding_registers(ROH_FINGER_FORCE0, count=6, slave=hand_id)
                 #     self.bus_mutex.release
                 # except ModbusException as exc:
                 #     self.get_logger().error(f"ERROR: exception in pymodbus {exc}")

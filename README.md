@@ -49,13 +49,6 @@ export PYTHONPATH=$PYTHONPATH:~/ros2_ws/src/venv/lib/python3.12/site-packages  #
 source ~/.bashrc
 ```
 
-### 1.4. Install requirements
-
-```BASH
-cd /path/to/workspace
-pip3 install -r requirements.txt
-```
-
 ## 2. Clone
 
 ```BASH
@@ -70,6 +63,13 @@ git clone ssh://git@github.com/oymotion/rohand_ros2_pkg
 ```BASH
 cd /path/to/workspace
 colcon build
+```
+
+### 3.1. Install requirements
+
+```BASH
+cd /path/to/workspace/rohand_ros2_pkg
+pip3 install -r requirements.txt
 ```
 
 ## 4. Node rohand_can_serial
